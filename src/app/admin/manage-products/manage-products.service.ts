@@ -2,6 +2,7 @@ import { Injectable, Injector } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { switchMap } from 'rxjs/operators';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable()
 export class ManageProductsService extends ApiService {
@@ -31,11 +32,18 @@ export class ManageProductsService extends ApiService {
 
   private getPreSignedUrl(fileName: string): Observable<string> {
     const url = this.getUrl('import', 'import');
+    let headers = new HttpHeaders();
+    const token = localStorage.getItem('authorization_token');
+
+    if (token) {
+      headers = headers.append('Authorization', `Basic ${token}`);
+    }
 
     return this.http.get<string>(url, {
       params: {
         name: fileName,
       },
+      headers,
     });
   }
 }
